@@ -13,8 +13,12 @@ function renderTiers()
 	const tiers = document.getElementById('tiers-container');
 	tiers.innerHTML = "";
 
+	id = 1;
 	for (let tier of initTiers)
 	{
+		// Réattribution des id des tiers (dans le cas d'une suppression ou d'un déplacement)
+		tier.id = id++;
+
 		let categorie = `
 		<div class="row align-items-center tier-row" data-index="${tier.id}">
 			<div class="col-2 text-center p-2" style="background: ${tier.color}">
@@ -40,13 +44,13 @@ function renderTiers()
 	}
 }
 
-// function deleteTier(index)
-// {
-// 	initTiers = initTiers.filter(tier => tier.id != index);
-// 	renderTiers();
-// 	renderItems();
-// 	renderDrag();
-// }
+function deleteTier(index)
+{
+	initTiers = initTiers.filter(tier => tier.id != index);
+	renderTiers();
+	renderItems();
+	renderDrag();
+}
 
 function moveTier(index, direction)
 {

@@ -15,12 +15,12 @@ tiers.addEventListener("click", (event) =>
 	if (event.target.classList.contains("move-down"))
 		moveTier(index - 1, "down");
 
-	// // Lors du clic sur le bouton de suppression
-	// if (event.target.classList.contains("delete-tier"))
-	// {
-	// 	if (window.confirm("Voulez-vous vraiment supprimer ce tier ?"))
-	// 		deleteTier(index);
-	// }
+	// Lors du clic sur le bouton de suppression
+	if (event.target.classList.contains("delete-tier"))
+	{
+		if (window.confirm("Voulez-vous vraiment supprimer ce tier ?"))
+			deleteTier(index);
+	}
 
 	// Lors du clic sur le titre du tier
 	if (event.target.classList.contains("tier-title"))
