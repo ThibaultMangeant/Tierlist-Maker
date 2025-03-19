@@ -6,12 +6,107 @@ let initTiers = [
     { id: 5, name: 'Catastrophique', color: '#4E9A51', items: [{ id: 3, text: "CSS" }] }
 ];
 
+async function fetchInitTiers()
+{
+	try
+	{
+		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test',
+		{
+			method: "GET", // Doit être la même que celle demandé par l'API
+			headers:
+			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+				"Content-Type": "application/json"
+			},
+		});
+		
+		const data = await response.json();
+		
+		if (response.ok)
+		{
+			// initTiers = data;
+		}
+		else
+		{
+			console.log("Erreur lors de la récupération des données");
+		}
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
+}
+
+async function fetchReorderTiers()
+{
+	try
+	{
+		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test/reorder-tiers',
+		{
+			method: "PUT", // Doit être la même que celle demandé par l'API
+			headers:
+			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(initTiers)
+		});
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
+}
+
+async function fetchDeleteTier()
+{
+	try
+	{
+		const response = await fetch('http://localhost:5000/docs/#/api/tier/test',
+		{
+			method: "DELETE", // Doit être la même que celle demandé par l'API
+			headers:
+			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(initTiers)
+		});
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
+}
+
+async function fetchShowTitle()
+{
+	try
+	{
+		const response = await fetch('http://localhost:5000/docs/#/api/tier/test',
+		{
+			method: "PUT", // Doit être la même que celle demandé par l'API
+			headers:
+			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(initTiers)
+		});
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
+}
 
 
 function renderTiers()
 {
 	const tiers = document.getElementById('tiers-container');
 	tiers.innerHTML = "";
+
+	fetchInitTiers();
 
 	id = 1;
 	for (let tier of initTiers)
@@ -47,6 +142,9 @@ function renderTiers()
 function deleteTier(index)
 {
 	initTiers = initTiers.filter(tier => tier.id != index);
+
+	fetchDeleteTier();
+
 	renderTiers();
 	renderItems();
 	renderDrag();
@@ -69,6 +167,7 @@ function moveTier(index, direction)
 		tier.id = cpt + 1;
 	});
 
+	fetchReorderTiers();
 	renderTiers();
 }
 
@@ -94,4 +193,6 @@ function showTitle(element)
 	h3Element.classList.add("tier-title");
 
 	inputElement.replaceWith(h3Element);
+
+	fetchShowTitle();
 }

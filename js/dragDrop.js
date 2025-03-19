@@ -1,3 +1,23 @@
+async function fetchDragDropItem(itemId, tierId)
+{
+	try
+	{
+		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test/move-item-to-tier',
+		{
+			method: "POST",
+			headers:
+			{
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ itemId: itemId, tierId: tierId })
+		});
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
+}
+
 function renderDrag()
 {
 	const draggable = document.querySelectorAll('.item');
@@ -42,6 +62,8 @@ function renderDrag()
 
 				initTiers[indexTier].items.push(itemDrag);
 				otherItems = otherItems.filter(item => item.id !== itemDrag.id);
+
+				fetchDragDropItem(itemDrag.id, indexTier);
 
 				renderTiers();
 				renderItems();
