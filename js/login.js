@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () =>
 			if (response.ok)
 			{
 				sessionStorage.setItem("token", data.token);
-				window.location.href = "../index.html"; // Redirige vers la tier-list ou une autre page
+				window.location.href = "list.html"; // Redirige vers la tier-list ou une autre page
 			}
 			else
 			{

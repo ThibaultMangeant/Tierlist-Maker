@@ -1,30 +1,37 @@
-let initTiers = [
-    { id: 1, name: 'Incontournable', color: '#FF8C42', items: [{ id: 1, text: "PHP" }, { id: 4, text: "SQL" }] },
-    { id: 2, name: 'Moyenne', color: '#EFBF3E', items: [{ id: 2, text: "Javascript" }] },
-    { id: 3, name: 'Passable', color: '#C2C236', items: [] },
-    { id: 4, name: 'Médiocre', color: '#6FBF73', items: [] },
-    { id: 5, name: 'Catastrophique', color: '#4E9A51', items: [{ id: 3, text: "CSS" }] }
-];
+/* let initTiers = [
+    { id: 0, name: 'Incontournable', color: '#FF8C42', items: [{ id: 1, text: "PHP" }, { id: 4, text: "SQL" }] },
+    { id: 1, name: 'Moyenne', color: '#EFBF3E', items: [{ id: 2, text: "Javascript" }] },
+    { id: 2, name: 'Passable', color: '#C2C236', items: [] },
+    { id: 3, name: 'Médiocre', color: '#6FBF73', items: [] },
+    { id: 4, name: 'Catastrophique', color: '#4E9A51', items: [{ id: 3, text: "CSS" }] }
+];*/
 
 async function fetchInitTiers()
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test',
+		const response = await fetch('http://localhost:5000/api/tierlist/' + idTierlist,
 		{
-			method: "GET", // Doit être la même que celle demandé par l'API
+			method: "GET",
 			headers:
 			{
 				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
-			},
+			}
 		});
 		
 		const data = await response.json();
 		
 		if (response.ok)
 		{
-			// initTiers = data;
+			initTiers = data.tiers.map((tier, index) =>
+			({
+				...tier, // Copie de l'objet tier
+				id: index, // Réattribution des id des tiers
+			}));
+
+			console.log("Tiers récupérés avec succès");
+			renderTiers();
 		}
 		else
 		{
@@ -41,16 +48,29 @@ async function fetchReorderTiers()
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test/reorder-tiers',
+		const response = await fetch('http://localhost:5000/api/tierlist/' + idTierlist + '/reorder-tiers',
 		{
-			method: "PUT", // Doit être la même que celle demandé par l'API
+			method: "PUT",
 			headers:
 			{
 				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(initTiers)
+			body: JSON.stringify({
+				tierOrder: initTiers.map(tier => tier._id)
+			})
 		});
+
+		const data = await response.json();
+		if (response.ok)
+		{
+			console.log(data);
+			console.log("Ordre des tiers mis à jour avec succès");
+		}
+		else
+		{
+			console.log("Erreur lors de la mise à jour de l'ordre des tiers");
+		}
 	}
 	catch (error)
 	{
@@ -58,20 +78,30 @@ async function fetchReorderTiers()
 	}
 }
 
-async function fetchDeleteTier()
+async function fetchDeleteTier(tierId)
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/tier/test',
+		const response = await fetch('http://localhost:5000/api/tier/' + tierId,
 		{
-			method: "DELETE", // Doit être la même que celle demandé par l'API
+			method: "DELETE",
 			headers:
 			{
 				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(initTiers)
+			}
 		});
+
+		const data = await response.json();
+		if (response.ok)
+		{
+			console.log(data);
+			console.log("Tier supprimé avec succès");
+		}
+		else
+		{
+			console.log("Erreur lors de la suppression du tier");
+		}
 	}
 	catch (error)
 	{
@@ -79,20 +109,31 @@ async function fetchDeleteTier()
 	}
 }
 
-async function fetchShowTitle()
+async function fetchShowTitle(idTier, newTitle, color)
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/tier/test',
+		const response = await fetch('http://localhost:5000/api/tier/' + idTier,
 		{
-			method: "PUT", // Doit être la même que celle demandé par l'API
+			method: "PUT",
 			headers:
 			{
 				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(initTiers)
+			body: JSON.stringify({"name": newTitle, "color": color})
 		});
+
+		const data = await response.json();
+		if (response.ok)
+		{
+			console.log(data);
+			console.log("Titre mis à jour avec succès");
+		}
+		else
+		{
+			console.log("Erreur lors de la mise à jour du titre");
+		}
 	}
 	catch (error)
 	{
@@ -105,8 +146,6 @@ function renderTiers()
 {
 	const tiers = document.getElementById('tiers-container');
 	tiers.innerHTML = "";
-
-	fetchInitTiers();
 
 	id = 1;
 	for (let tier of initTiers)
@@ -136,18 +175,19 @@ function renderTiers()
 		</div>`;
 
 		tiers.innerHTML += categorie;
+
+		renderItems();
 	}
 }
 
 function deleteTier(index)
 {
+	const tierToDelete = initTiers[index - 1];
 	initTiers = initTiers.filter(tier => tier.id != index);
 
-	fetchDeleteTier();
+	fetchDeleteTier(tierToDelete._id);
 
 	renderTiers();
-	renderItems();
-	renderDrag();
 }
 
 function moveTier(index, direction)
@@ -194,5 +234,5 @@ function showTitle(element)
 
 	inputElement.replaceWith(h3Element);
 
-	fetchShowTitle();
+	fetchShowTitle(initTiers[element.dataset.index - 1]._id, h3Element.innerText, element.querySelector('.tier-title').parentElement.style.background);
 }

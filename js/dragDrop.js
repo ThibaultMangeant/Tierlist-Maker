@@ -2,15 +2,31 @@ async function fetchDragDropItem(itemId, tierId)
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/tierlist/test/move-item-to-tier',
+		const response = await fetch('http://localhost:5000/api/tierlist/' + idTierlist + '/move-item-to-tier',
 		{
-			method: "POST",
+			method: "PUT",
 			headers:
 			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({ itemId: itemId, tierId: tierId })
+			body: JSON.stringify({
+				"itemId": itemId,
+				"tierId": tierId
+			})
 		});
+
+		const data = await response.json();
+
+		if (response.ok)
+		{
+			console.log(data);
+			console.log("Item déplacé avec succès");
+		}
+		else
+		{
+			console.log("Erreur lors du déplacement de l'item");
+		}
 	}
 	catch (error)
 	{
@@ -57,17 +73,21 @@ function renderDrag()
 
 			if (itemDrag)
 			{
+				// Récupérer le tier cible où l'élément est déplacé
 				const tier = event.target.closest('.tier-row');
-				const indexTier = parseInt(tier.getAttribute('data-index')) - 1;
+				const tierIndex = parseInt(tier.getAttribute('data-index')) - 1;
+				const tierId = initTiers[tierIndex]._id;
 
-				initTiers[indexTier].items.push(itemDrag);
+				// Mise à jour des éléments dans les tiers (localement)
+				initTiers[tierIndex].items.push(itemDrag);
 				otherItems = otherItems.filter(item => item.id !== itemDrag.id);
 
-				fetchDragDropItem(itemDrag.id, indexTier);
+
+				console.log(itemDrag);
+				console.log(tierId);
+				fetchDragDropItem(itemDrag._id, tierId);
 
 				renderTiers();
-				renderItems();
-				renderDrag();
 			}
 		});
 	});

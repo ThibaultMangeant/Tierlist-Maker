@@ -1,4 +1,7 @@
-document.addEventListener("DOMContentLoaded", renderTiers);
+const url = new URL(window.location.href);
+const idTierlist = url.searchParams.get("id");
+
+document.addEventListener("DOMContentLoaded", fetchInitTiers);
 document.addEventListener("DOMContentLoaded", renderItems);
 document.addEventListener("DOMContentLoaded", renderDrag );
 

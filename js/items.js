@@ -8,15 +8,28 @@ async function fetchAddItem(newItem)
 {
 	try
 	{
-		const response = await fetch('http://localhost:5000/docs/#/api/item',
+		const response = await fetch('http://localhost:5000/api/item',
 		{
 			method: "POST",
 			headers:
 			{
+				"Authorization": `Bearer ${sessionStorage.getItem("token")}`,
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({ text: newItem })
+			body: JSON.stringify({ "text": newItem })
 		});
+
+		const data = await response.json();
+
+		if (response.ok)
+		{
+			console.log(data);
+			console.log("Item ajouté avec succès");
+		}
+		else
+		{
+			console.log("Erreur lors de l'ajout de l'item");
+		}
 	}
 	catch (error)
 	{
